@@ -1,7 +1,7 @@
 import pygame
 import os
-import random
 import sys
+import asyncio
 
 pygame.font.init()
 
@@ -12,20 +12,19 @@ pygame.display.set_caption("Biscuit Tapper!")
 
 # colours
 WHITE = (255, 255, 255)
-BLACK = (0,0,0)
-RED = (255,0,0)
+BLACK = (8,8,8)
 GREY = (165,165,165)
 
 FPS = 60
 CIRCLE_WIDTH, CIRCLE_HEIGHT = 300*1.65, 200*1.65
 
 # fonts
-TITLE_FONT = pygame.font.SysFont(None, 85)
-UPGRADE_FONT = pygame.font.SysFont(None, 55)
-SCORE_FONT = pygame.font.SysFont(None, 100)
-SEVENTY_FONT = pygame.font.SysFont(None, 70)
-SEVENTY_ONE_FONT = pygame.font.SysFont(None, 78)
-GAME_OVER_FONT = pygame.font.SysFont(None, 200)
+TITLE_FONT = pygame.font.Font(None, 85)
+UPGRADE_FONT = pygame.font.Font(None, 55)
+SCORE_FONT = pygame.font.Font(None, 100)
+SEVENTY_FONT = pygame.font.Font(None, 70)
+SEVENTY_ONE_FONT = pygame.font.Font(None, 78)
+GAME_OVER_FONT = pygame.font.Font(None, 200)
 
 PLAYER_BISCUITS = 0
 HEIGHT_BASE = HEIGHT//8
@@ -45,14 +44,14 @@ biscuit_image_object = pygame.image.load(
 # image scaling
 biscuit_image = pygame.transform.rotate(pygame.transform.scale(
     biscuit_image_object,(CIRCLE_WIDTH, CIRCLE_HEIGHT)),0)
-BACKGROUND = pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'background.JPG')), (WIDTH, HEIGHT))
+BACKGROUND = pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'background.jpg')), (WIDTH, HEIGHT))
 
 #time stuff
 TIMER_EVENT = pygame.USEREVENT + 1
 pygame.time.set_timer(TIMER_EVENT, 1000) # 1 second
 
 BOSS_TIMER_EVENT = pygame.USEREVENT + 2
-pygame.time.set_timer(BOSS_TIMER_EVENT, 60000) # 1 minute
+pygame.time.set_timer(BOSS_TIMER_EVENT, 40000) # 40 seconds
 WORSEN_TIMER_EVENT = pygame.USEREVENT + 3
 pygame.time.set_timer(WORSEN_TIMER_EVENT, 7500) # 7.5 seconds
 
@@ -120,7 +119,7 @@ def game_over(player_points):
     sys.exit()
 
 
-def main(PLAYER_BISCUITS, clicking_power, upgrade1_cost, upgrade2_cost,
+async def main(PLAYER_BISCUITS, clicking_power, upgrade1_cost, upgrade2_cost,
           biscuits_per_second, BACKGROUND, boss, score_leak, player_points):
     clock = pygame.time.Clock()
     run = True
@@ -138,7 +137,7 @@ def main(PLAYER_BISCUITS, clicking_power, upgrade1_cost, upgrade2_cost,
 
             if event.type == BOSS_TIMER_EVENT:
                 BACKGROUND = pygame.transform.scale(pygame.image.load(
-                    os.path.join('Assets', 'evil_background.JPG')), (WIDTH, HEIGHT))
+                    os.path.join('Assets', 'evil_background.jpg')), (WIDTH, HEIGHT))
                 boss = True
 
             if event.type == WORSEN_TIMER_EVENT and boss == True:
@@ -182,10 +181,10 @@ def main(PLAYER_BISCUITS, clicking_power, upgrade1_cost, upgrade2_cost,
 
         draw_window(PLAYER_BISCUITS, upgrade1_cost, clicking_power, biscuits_per_second,
                      upgrade2_cost, BACKGROUND, score_leak, boss)
+        await asyncio.sleep(0)
 
-    pygame.quit()
 
 
 if __name__ == "__main__":
-    main(PLAYER_BISCUITS, clicking_power, upgrade1_cost, upgrade2_cost,
-          biscuits_per_second, BACKGROUND, boss, score_leak, player_points)
+    asyncio.run(main(PLAYER_BISCUITS, clicking_power, upgrade1_cost, upgrade2_cost,
+          biscuits_per_second, BACKGROUND, boss, score_leak, player_points))
